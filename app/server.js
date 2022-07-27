@@ -1,10 +1,30 @@
 //TODO: Create file structure: server, scema, query and possible seeds, gitignore, node modules, readme, install npms 
 //TODO: List dependencies. There are a couple we already know we need. 
 //It appears we need something called console.table- don't know what it is yet but listed on uw bootcampspot website. 
-const sql = require("mysql");
+const mysql = require('mysql2');
 const inquirer = require("inquirer");
 const consoleTable = require("console.table");
 //Not sure what else to do here yet other than set up server connect, so will build schema table for now for better idea of what data I will be trying to fill. 
+//Our server here will be different because we need to connect to mysql database. Haven't learned this in class yet so looking it up. 
+const appConnection = mysql.startConnection ({
+    //determines host and port number
+    host: "localhost",
+    port: "3000",
+    //determines sql root user (me)
+    user: "root",
+    //still have a password for mysql set up in .bashrc but its just password
+    password: "password",
+    //employees db is name of our created database in schema.sql
+    database: "ouremployees_db"
+});
+
+appConnection.connect(function(err) {
+    if (err) throw err;
+    else {
+        console.log("You have connected as id " + appConnection.threadId);
+        startUp();
+    };
+});
 //Will create the schema based off of the images from UW bootcampspot. It looks like we will have 3 primary tables we will be joining. 
 //It looks like our department id will reference the departments role, and the role id will in turn hold reference to an employees given role. 
 //TODO: Because this will be an inquirer-based input app, the next thing I can think of to do is to build the inquirer.prompt section. 
@@ -40,8 +60,20 @@ function startUp() {
             case "Add Role":
                 break; 
             case "Exit":
-                console.log("You may safely exit the terminal. Have a nice day.")
+                console.log("You may safely exit the terminal. Have a nice day.");
+                appConnection.end();
                 break;
         };
     });
 };
+
+
+connection.query(
+    'SELECT * FROM `table` WHERE `name` = "Page" AND `age` > 45',
+    function(err, results, fields) {
+      console.log(results); // results contains rows returned by server
+      console.log(fields); // fields contains extra meta data about results, if available
+    }
+  );
+//will start off with an experimental function trying to access sql DB. However, in order to populate a table wondering if I need seeds first.
+
