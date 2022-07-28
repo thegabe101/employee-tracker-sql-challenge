@@ -26,6 +26,26 @@ appConnection.connect(function(err) {
         startUp();
     };
 });
+
+//function to prompt the user for any additional commands they'd like to run once they finish one. 
+function whatElse() {
+    inquirer.prompt( {
+        name: 'doSomethingElse',
+        type: `list`,
+        message: `Is there anything else you'd like to do today?`,
+        choices: [`Yes`, `No`]
+    }).then (function (yourAnswer) {
+        switch (yourAnswer.doSomethingElse) {
+            case "Yes":
+                startUp();
+                break;
+            case "No":
+                console.log("You may safely exit the terminal. Have a nice day.");
+                appConnection.end();
+                break;
+        }
+    })
+}
 //Will create the schema based off of the images from UW bootcampspot. It looks like we will have 3 primary tables we will be joining. 
 //It looks like our department id will reference the departments role, and the role id will in turn hold reference to an employees given role. 
 //TODO: Because this will be an inquirer-based input app, the next thing I can think of to do is to build the inquirer.prompt section. 
@@ -92,31 +112,97 @@ function startUp() {
 //     });
 // };
 
+//will start off with an experimental function trying to access sql DB. However, in order to populate a table wondering if I need seeds first.
+
 //This command is my first successful one. Realized I don't need const query and can simply write the function as a const and call it from prompt above. 
 const findAllEmployees = () => {
     appConnection.query(`SELECT * FROM employees`, (err, results) => {
-        console.log('\n')
+        console.log('\n');
         console.table(results);
+        console.log('-------------------------------------------------------\n');
+        whatElse();
         console.log('-------------------------------------------------------\n')
     })
 }
 
+//Similar to findAllEmployees. Pulls all departments from department table and displays them with their registered id.
 const findAllDepartments = () => {
     appConnection.query(`SELECT * FROM department`, (err, results) => {
-        console.log('\n')
+        console.log('\n');
         console.table(results);
+        console.log('-------------------------------------------------------\n');
+        whatElse();
         console.log('-------------------------------------------------------\n')
     })
 }
 
+//Decided to make this one show salary. Not sure what I will do with it. 
 const findAllRoles = () => {
     appConnection.query(`SELECT * FROM roles`, (err, results) => {
         console.log('\n')
         console.table(results);
         console.log('-------------------------------------------------------\n')
+        whatElse();
+        console.log('-------------------------------------------------------\n')
     })
 }
 
+//TODO: Determine how to build ADD functions.
 
-//will start off with an experimental function trying to access sql DB. However, in order to populate a table wondering if I need seeds first.
+//start by selecting all roles
+const addEmployee = () => {
+    appConnection.query(`SELECT * FROM roles`, function (err, results) {
+        if (err) throw err;
+
+        //run prompt asking for new employee information
+        inquirer.prompt([
+            {
+                name: 'firstName',
+                type: 'input',
+                message: 'What is the employees first name?'
+            },
+            {
+                name: 'lastName',
+                type: 'input',
+                message: 'What is the employees last name?'
+            },
+            {
+                //Must create an empty role array to allow for addition of any role.
+                //for loop iterates over all possibilities of role titles and then we return the data with the employees role
+                name: 'employeeRole',
+                type: 'input',
+                message: 'What is the employees role?',
+                choices: function () {
+                    let possibleRoles = [];
+
+                    for (var i = 0; i < results.length; i++) {
+                        possibleRoles.push(results[i].title);
+                    }
+
+                    return possibleRoles;
+                }
+            }
+        ]).then(function (answer) {
+            //we select the employee with their input name and insert into the set with the returned employeeRole data from before
+            appConnection.query("SELECT * FROM roles WHERE ?", { title: answer.employeeRole}, function (err, results) {
+                if (err) throw err;
+                appConnection.query("INSERT INTO employees SET ?", {
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    //unsure how to generate a unique role id for an added employee. seems it will default to the first item of the array from the roleset the employee is coming from. 
+                    role_id: results[0].id,
+                    manager_id: results[0].id 
+                });
+                //employee should now be in database if the user selects view all employees again. 
+                console.log('\n You have successfully added this employee to the database.');
+            });
+
+            whatElse();
+        })
+    })
+}
+
+//We can follow a very similar pattern for adding departments and roles, but they will be significantly simpler because there is no need to role match
+
+const addDepartment = 
 
