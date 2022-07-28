@@ -204,5 +204,20 @@ const addEmployee = () => {
 
 //We can follow a very similar pattern for adding departments and roles, but they will be significantly simpler because there is no need to role match
 
-const addDepartment = 
+const addDepartment = () => {
+    inquirer.prompt({
+        type: 'input',
+        name: 'newDepartment',
+        message: 'What is the name of the department you would like to add?'
+    }).then(function(answer) {
+        //inserts into department set whatever the users answer was for their newDepartment name
+        appConnection.query('INSERT INTO department SET ?', { dept_name: answer.newDepartment }, function (err) {
+            if(err) throw err;
+            else {
+        console.log('\n You have successfully added this department to the database.')  ;  
+        }}
+        );
+    whatElse();
+    });
+}
 
