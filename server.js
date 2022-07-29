@@ -304,44 +304,45 @@ const addRole = () => {
 //TODO: NUMEROUS ATTEMPTS AT UPDATE ROLE but couldn't figure it out
 //!! This is something to work with tutor on. Butting my head against the wall at this point.
 
-// const updateRole = () => {
-//     let managerArray = [];
-//     let roleArray = [];
-//     appConnection.query('SELECT employees.id, employees.first_name, employees.last_name, FROM employees' (err, employeeData) => {
-//         if(err) throw err;
-//         employeeData.forEach((employees) => {
-//             managerArray.push(`${employees.first_name} ${employees.last_name}`)
-//         });
-//         appConnection.query(`SELECT roles.id, roles.title FROM roles`, (err, data) => {
-//             if(err) throw err;
-//             data.forEach(roles) => {
-//                 roleArray.push(roles.title)
-//             });
-//             inquirer.prompt([
-//                 {
-//                     name: 'employeeName',
-//                     type: 'list',
-//                     message: 'Whos role would you like to update?',
-//                     choices: managerArray
-//                 },
-//                 {
-//                     name: 'updateEmployeeRole',
-//                     type: 'list',
-//                     message: 'What role would you like the employee to have?',
-//                     choices: roleArray
-//                 }
-//             ]).then(response => {
-//                 managerArray.push(answer.employeeName);
-//                 roleArray.push()
-//                 let newTitle;
-//                 let employeeId;
-//                 employeeData.forEach(employees => {
-                    
-//                 });
-//             })
-//         });
-//     });
-// };
+const updateRole = () => {
+    let managerArray = [];
+    let roleArray = [];
+    appConnection.query('SELECT employees.id, employees.first_name, employees.last_name FROM employees', (err, employeeData) => {
+        if(err) throw err;
+        employeeData.forEach((employees) => {
+            managerArray.push(`${employees.first_name} ${employees.last_name}`)
+        });
+        appConnection.query(`SELECT roles.id, roles.title FROM roles`, (err, data) => {
+            if(err) throw err;
+            data.forEach((roles) => {
+                roleArray.push(roles.title)
+                console.log(roleArray);
+            });
+            inquirer.prompt([
+                {
+                    name: 'employeeName',
+                    type: 'list',
+                    message: 'Whos role would you like to update?',
+                    choices: managerArray
+                },
+                {
+                    name: 'updateEmployeeRole',
+                    type: 'list',
+                    message: 'What role would you like the employee to have?',
+                    choices: roleArray
+                }
+            ]).then(response => {
+                // managerArray.push(response.employeeName);
+                // roleArray.push()
+                // let newTitle;
+                let employeeNameArray = response.employeeName.split(" ")
+                appConnection.query(`UPDATE employees SET role_id = '${roleArray.indexOf(response.updateEmployeeRole) + 1}' WHERE employees.first_name = '${employeeNameArray[0]}' AND employees.last_name = '${employeeNameArray[1]}';`)
+            })
+        });
+        console.log('\n You have successfully removed ${answer.firstName} ${answer.lastName} from the database.');
+        whatElse();
+    });
+};
 
 //to delete employee, we can simply start an inquirer prompt that will allow the user to choose from a case of an employee and query delete from the employee database  
 // const deleteEmployee = () => {
