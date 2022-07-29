@@ -1,6 +1,6 @@
 # employee-tracker-sql-challenge
 
-## Video Walkthrough Link
+## Video Walkthrough Link: https://drive.google.com/file/d/1CfF5CzymdAsyGoXwy4xRk4sjSda-3M9_/view
 
 ## Table of Contents
 
@@ -32,13 +32,16 @@ This project involved creating a terminal app in the command line interface usin
 
 - There is a bug involving a promise response that causes some lines to print twice in the command terminal, specifically the line asking the user what they would like to do. This has not been solved but is something I would like to source the root of in order to better understand promises.
 
+- Update role is not currently working. Several attempts were made at coding it but ultimately could not figure it out.
+
+- There is some bugginess in assigning correct salary when adding a new employee that sometimes results in new employee receiving the salary of the department they are assigned to.
+
 ## Screenshots
 
-- ![Alt= .](./screenshots/screenshot1.jpg)
-- ![Alt= .](./screenshots/screenshot2.jpg)
-- ![Alt= .](./screenshots/screenshot3.jpg)
-- ![Alt= .](./screenshots/screenshot4.jpg)
-- ![Alt= .](./screenshots/screenshot5.jpg)
+- ![Alt= Screenshot showing server.js running in node with a list of employees.](./screenshots/screenshot1.jpg)
+- ![Alt= Screenshot showing the SQL schema.](./screenshots/screenshot2.jpg)
+- ![Alt= Screenshot showing default SQL seeding.](./screenshots/screenshot3.jpg)
+- ![Alt= Screenshot showing opening Inquirer prompt.](./screenshots/screenshot4.jpg)
 
 ## Credits
 

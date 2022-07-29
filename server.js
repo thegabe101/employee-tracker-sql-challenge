@@ -57,7 +57,7 @@ function startUp() {
         name: 'initialQuestions',
         type: 'list',
         message: 'Hello, what would you like to do today?',
-        choices: ['View All Employees', 'View All Departments', 'View All Roles', 'Add Employee', 'Add Department', 'Add Role', 'Update Roll', 'Delete Employee', 'Exit']
+        choices: ['View All Employees', 'View All Departments', 'View All Roles', 'Add Employee', 'Add Department', 'Add Role', 'Update Role', 'Delete Employee', 'Exit']
     }).then (function (answers) {
         //uses switch to identify which instance of inquirer to run next based on user input
         switch (answers.initialQuestions) {
@@ -173,7 +173,7 @@ const addEmployee = () => {
                 //Must create an empty role array to allow for addition of any role.
                 //for loop iterates over all possibilities of role titles and then we return the data with the employees role
                 name: 'employeeRole',
-                type: 'input',
+                type: 'list',
                 message: 'What is the employees role?',
                 choices: function () {
                     let possibleRoles = [];
@@ -199,11 +199,10 @@ const addEmployee = () => {
                 //employee should now be in database if the user selects view all employees again. 
                 console.log('\n You have successfully added this employee to the database.');
             });
-
             whatElse();
-        })
-    })
-}
+        });
+    });
+};
 
 //We can follow a very similar pattern for adding departments and roles, but they will be significantly simpler because there is no need to role match
 
@@ -217,7 +216,7 @@ const addDepartment = () => {
         appConnection.query('INSERT INTO department SET ?', { dept_name: answer.newDepartment }, function (err) {
             if(err) throw err;
             else {
-        console.log('\n You have successfully added this department to the database.')  ;  
+        console.log('\n You have successfully added this department to the database.');  
         }}
         );
     whatElse();
@@ -293,31 +292,96 @@ const addRole = () => {
 //                 }
 //             }
 //         ]).then(function (answer) {
-//             appConnection.query("UPDATE employee SET employee.role_id = ? WHERE employee.id = ?", {title: answer.updatedRole}, function (err, results) {
+//             appConnection.query("UPDATE employees SET employees.role_id = ? WHERE employees.id = ?", {title: answer.updatedRole}, function (err, results) {
 //                 if(err) throw err;
 //                 console.log('Employee role has been updated.')
-//             })
+//             });
+//             whatElse();
 //         })
-//     }
+//     })
+// }
 
+//TODO: NUMEROUS ATTEMPTS AT UPDATE ROLE but couldn't figure it out
+//!! This is something to work with tutor on. Butting my head against the wall at this point.
 
+// const updateRole = () => {
+//     let managerArray = [];
+//     let roleArray = [];
+//     appConnection.query('SELECT employees.id, employees.first_name, employees.last_name, FROM employees' (err, employeeData) => {
+//         if(err) throw err;
+//         employeeData.forEach((employees) => {
+//             managerArray.push(`${employees.first_name} ${employees.last_name}`)
+//         });
+//         appConnection.query(`SELECT roles.id, roles.title FROM roles`, (err, data) => {
+//             if(err) throw err;
+//             data.forEach(roles) => {
+//                 roleArray.push(roles.title)
+//             });
+//             inquirer.prompt([
+//                 {
+//                     name: 'employeeName',
+//                     type: 'list',
+//                     message: 'Whos role would you like to update?',
+//                     choices: managerArray
+//                 },
+//                 {
+//                     name: 'updateEmployeeRole',
+//                     type: 'list',
+//                     message: 'What role would you like the employee to have?',
+//                     choices: roleArray
+//                 }
+//             ]).then(response => {
+//                 managerArray.push(answer.employeeName);
+//                 roleArray.push()
+//                 let newTitle;
+//                 let employeeId;
+//                 employeeData.forEach(employees => {
+                    
+//                 });
+//             })
+//         });
+//     });
+// };
 
-// to delete employee, we can simply start an inquirer prompt that will allow the user to choose from a case of an employee and query delete from the employee database  
+//to delete employee, we can simply start an inquirer prompt that will allow the user to choose from a case of an employee and query delete from the employee database  
+// const deleteEmployee = () => {
+//     let currentEmployees = appConnection.query("SELECT * FROM employees", [id]);
+//     inquirer.prompt ({
+//         name: "deleteEmp",
+//         type: "list",
+//         message: "Which employee would you like to delete from the database?",
+//         choices: currentEmployees
+//     }).then(function (answer) {
+//         appConnection.query("DELETE FROM employees WHERE id = ?", {answer}, function (err) {
+//             if (err) throw err;
+//             console.log('\n ${answer.id} has been deleted from the employee list');
+//         })
+//         whatElse();
+//     })
+// }
+
+//scratch that. didn't work. seems theres no way to pull the employee list from id that way. going to try simply using first/last name from inquirer inputs instead
+
 const deleteEmployee = () => {
-    let currentEmployees = appConnection.query("SELECT * FROM employees", {id});
-    inquirer.prompt ({
-        name: "deleteEmp",
-        type: "list",
-        message: "Which employee would you like to delete from the database?",
-        choices: currentEmployees
-    }).then(function (answer) {
-        appConnection.query("DELETE FROM employees WHERE id = ?", {answer}, function (err) {
-            if (err) throw err;
-            console.log('\n ${answer.id} has been deleted from the employee list');
-        })
-        whatElse();
-    })
-}
+    inquirer.prompt ([
+        {
+            name: 'firstName',
+            type: 'input',
+            message: 'What is the first name of the employee you would like to delete?'
+        },
+        {
+            name: 'lastName',
+            type: 'input',
+            message: 'What is the last name of the employee you would like to delete?'
+        }
+    ]).then(function (answer) {
+        appConnection.query('DELETE FROM employees WHERE first_name = ? and last_name = ?', [answer.firstName, answer.lastName], function (err) {
+            console.log('\n You have successfully removed ${answer.firstName} ${answer.lastName} from the database.');
+            whatElse();
+        }
+        );
+    });
+};
 
 
 
