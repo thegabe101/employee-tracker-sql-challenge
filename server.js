@@ -57,7 +57,7 @@ function startUp() {
         name: 'initialQuestions',
         type: 'list',
         message: 'Hello, what would you like to do today?',
-        choices: ['View All Employees', 'View All Departments', 'View All Roles', 'Add Employee', 'Add Department', 'Add Role', 'Update Roll', 'Exit']
+        choices: ['View All Employees', 'View All Departments', 'View All Roles', 'Add Employee', 'Add Department', 'Add Role', 'Update Roll', 'Delete Employee', 'Exit']
     }).then (function (answers) {
         //uses switch to identify which instance of inquirer to run next based on user input
         switch (answers.initialQuestions) {
@@ -81,11 +81,14 @@ function startUp() {
                 addDepartment();
                 break;
             case "Add Role":
-                    addRole();
-                    break;
+                addRole();
+                break;
             case "Update Role":
                 updateRole();
                 break;  
+            case "Delete Employee":
+                deleteEmployee();
+                break;
             case "Exit":
                 console.log("You may safely exit the terminal. Have a nice day.");
                 appConnection.end();
@@ -116,14 +119,14 @@ function startUp() {
 
 //This command is my first successful one. Realized I don't need const query and can simply write the function as a const and call it from prompt above. 
 const findAllEmployees = () => {
-    appConnection.query(`SELECT * FROM employees`, (err, results) => {
+    appConnection.query(`SELECT employees.id, employees.first_name, employees.last_name, roles.title, department.dept_name AS department, roles.salary, CONCAT (manager.first_name, " ", manager.last_name) AS manager FROM employees LEFT JOIN roles ON employees.role_id = roles.id LEFT JOIN department ON roles.department_id = department.id LEFT JOIN employees manager ON employees.manager_id = manager.id`, (err, results) => {
         console.log('\n');
         console.table(results);
         console.log('-------------------------------------------------------\n');
         whatElse();
-        console.log('-------------------------------------------------------\n')
-    })
-}
+        console.log('-------------------------------------------------------\n');
+    });
+};
 
 //Similar to findAllEmployees. Pulls all departments from department table and displays them with their registered id.
 const findAllDepartments = () => {
@@ -219,5 +222,102 @@ const addDepartment = () => {
         );
     whatElse();
     });
-}
+};
+
+//add role function will be similar but will require addition of properties salary and dept id 
+const addRole = () => {
+    appConnection.query(`SELECT * FROM department`, function (err, results) {
+        if (err) throw err;
+        //run prompt asking for new role information 
+        inquirer.prompt([
+            {
+                name: 'newRole',
+                type: 'input',
+                message: 'What is the title of the new role?'
+            },
+            {
+                name: 'salary',
+                type: 'input',
+                message: 'What is the salary of the new role?'
+            },
+            {
+                //Must create an empty role array to allow for addition of any role.
+                //for loop iterates over all possibilities of department ids and then we return the data with the the department ids
+                name: 'department',
+                type: 'list',
+                message: 'What department does the new role belong to?',
+                choices: function () {
+                    let possibleDepartments = [];
+
+                    for (var i = 0; i < results.length; i++) {
+                        possibleDepartments.push(results[i].dept_name);
+                    }
+
+                    return possibleDepartments;
+                }
+            }
+        ]).then(function (answer) {
+            //we select the department table and insert the new role into the set with the updated rolename
+            appConnection.query("SELECT * FROM department WHERE ?", { dept_name: answer.department}, function (err, results) {
+                if (err) throw err;
+                appConnection.query("INSERT INTO roles SET ?", {
+                    title: answer.newRole,
+                    //must use parseInt here to accept the salary input
+                    salary: parseInt(answer.salary), 
+                    //accepts the 0 point of the array just like add employee did 
+                    department_id: results[0].id
+                });
+                //role should now be in database if the user selects view all roles again. 
+                console.log('\n You have successfully added this role type to the database.');
+            });
+            whatElse();
+        })
+    });
+};
+
+const updateRole = () => {
+    appConnection.query('SELECT roles.id, roles.title FROM roles ORDER BY roles.id', function (err, results) {
+        if(err) throw err;
+        inquirer.prompt([
+            {
+                name: 'updatedRole',
+                type: 'input',
+                message: "How would you describe the new role?",
+                choices: function () {
+                    let possibleRoles = []
+                    
+                    for (var i = 0; i < results.length; i++) {
+                        possibleRoles.push(results[i].title);
+                    }
+                    return possibleRoles;
+                }
+            }
+        ]).then(function (answer) {
+            appConnection.query("UPDATE employee SET employee.role_id = ? WHERE employee.id = ?", {title: answer.updatedRole}, function (err, results) {
+                if(err) throw err;
+                console.log('Employee role has been updated.')
+            })
+        })
+    }
+
+
+
+//to delete employee, we can simply start an inquirer prompt that will allow the user to choose from a case of an employee and query delete from the employee database  
+// const deleteEmployee = () => {
+//     let currentEmployees = ("SELECT * FROM employees", {id});
+//     inquirer.prompt ({
+//         name: "deleteEmp",
+//         type: "list",
+//         message: "Which employee would you like to delete from the database?",
+//         choices: currentEmployees
+//     }).then(function (answer) {
+//         appConnection.query("DELETE FROM employees WHERE id = ?", {answer}, function (err) {
+//             if (err) throw err;
+//             console.log('\n ${answer.id} has been deleted from the employee list');
+//         })
+//         whatElse();
+//     })
+// }
+
+
 
