@@ -337,10 +337,10 @@ const updateRole = () => {
                 // let newTitle;
                 let employeeNameArray = response.employeeName.split(" ")
                 appConnection.query(`UPDATE employees SET role_id = '${roleArray.indexOf(response.updateEmployeeRole) + 1}' WHERE employees.first_name = '${employeeNameArray[0]}' AND employees.last_name = '${employeeNameArray[1]}';`)
+                console.log('\n You have successfully updated the employee role.');
+                whatElse();
             })
         });
-        console.log('\n You have successfully removed ${answer.firstName} ${answer.lastName} from the database.');
-        whatElse();
     });
 };
 

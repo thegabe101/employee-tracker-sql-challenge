@@ -1,6 +1,6 @@
 # employee-tracker-sql-challenge
 
-## Video Walkthrough Link: https://drive.google.com/file/d/1CfF5CzymdAsyGoXwy4xRk4sjSda-3M9_/view
+## Video Walkthrough Link: https://drive.google.com/file/d/1Hen1Q351KMSzLLbCXgagOh2u0P7J8ytH/view
 
 ## Table of Contents
 
