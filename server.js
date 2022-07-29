@@ -275,49 +275,49 @@ const addRole = () => {
     });
 };
 
-const updateRole = () => {
-    appConnection.query('SELECT roles.id, roles.title FROM roles ORDER BY roles.id', function (err, results) {
-        if(err) throw err;
-        inquirer.prompt([
-            {
-                name: 'updatedRole',
-                type: 'input',
-                message: "How would you describe the new role?",
-                choices: function () {
-                    let possibleRoles = []
+// const updateRole = () => {
+//     appConnection.query('SELECT roles.id, roles.title FROM roles ORDER BY roles.id', function (err, results) {
+//         if(err) throw err;
+//         inquirer.prompt([
+//             {
+//                 name: 'updatedRole',
+//                 type: 'input',
+//                 message: "How would you describe the new role?",
+//                 choices: function () {
+//                     let possibleRoles = []
                     
-                    for (var i = 0; i < results.length; i++) {
-                        possibleRoles.push(results[i].title);
-                    }
-                    return possibleRoles;
-                }
-            }
-        ]).then(function (answer) {
-            appConnection.query("UPDATE employee SET employee.role_id = ? WHERE employee.id = ?", {title: answer.updatedRole}, function (err, results) {
-                if(err) throw err;
-                console.log('Employee role has been updated.')
-            })
-        })
-    }
-
-
-
-//to delete employee, we can simply start an inquirer prompt that will allow the user to choose from a case of an employee and query delete from the employee database  
-// const deleteEmployee = () => {
-//     let currentEmployees = ("SELECT * FROM employees", {id});
-//     inquirer.prompt ({
-//         name: "deleteEmp",
-//         type: "list",
-//         message: "Which employee would you like to delete from the database?",
-//         choices: currentEmployees
-//     }).then(function (answer) {
-//         appConnection.query("DELETE FROM employees WHERE id = ?", {answer}, function (err) {
-//             if (err) throw err;
-//             console.log('\n ${answer.id} has been deleted from the employee list');
+//                     for (var i = 0; i < results.length; i++) {
+//                         possibleRoles.push(results[i].title);
+//                     }
+//                     return possibleRoles;
+//                 }
+//             }
+//         ]).then(function (answer) {
+//             appConnection.query("UPDATE employee SET employee.role_id = ? WHERE employee.id = ?", {title: answer.updatedRole}, function (err, results) {
+//                 if(err) throw err;
+//                 console.log('Employee role has been updated.')
+//             })
 //         })
-//         whatElse();
-//     })
-// }
+//     }
+
+
+
+// to delete employee, we can simply start an inquirer prompt that will allow the user to choose from a case of an employee and query delete from the employee database  
+const deleteEmployee = () => {
+    let currentEmployees = appConnection.query("SELECT * FROM employees", {id});
+    inquirer.prompt ({
+        name: "deleteEmp",
+        type: "list",
+        message: "Which employee would you like to delete from the database?",
+        choices: currentEmployees
+    }).then(function (answer) {
+        appConnection.query("DELETE FROM employees WHERE id = ?", {answer}, function (err) {
+            if (err) throw err;
+            console.log('\n ${answer.id} has been deleted from the employee list');
+        })
+        whatElse();
+    })
+}
 
 
 
